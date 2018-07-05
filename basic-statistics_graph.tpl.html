@@ -1,0 +1,28 @@
+<div class="box box-primary">
+  <div class="box-header">
+    <h3 class="box-title">{{domain.label}}</h3>
+  </div>
+  <div class="box-header">
+    <section class="col-md-6">
+      <label>Resource</label>
+      <select class="form-control ng-pristine ng-valid ng-valid-required" ng-model="selectedResource" ng-change="changeResourceValue(selectedResource)">
+        <option ng-repeat="resourceType in resourceTypes">{{resourceType}}</option>
+      </select>
+    </section>
+    <section class="col-md-6">
+      <label>Action</label>
+      <select class="form-control ng-pristine ng-valid ng-valid-required" x-ng-options="logAction for logAction in currentLogActions"
+        ng-model="selectedAction" ng-change="changeActionValue(selectedAction)">
+      </select>
+    </section>
+  </div>
+</div>
+<div class="box-body">
+  <label class="badge">
+    {{ 'STATISTICS.BASIC_DOMAIN_LABEL' | translate}} {{ domain.label }}
+  </label>
+  <div class="chart-cursor">
+    <nvd3 options='graphOptions' data='graphDatas'>
+    </nvd3>
+  </div>
+</div>

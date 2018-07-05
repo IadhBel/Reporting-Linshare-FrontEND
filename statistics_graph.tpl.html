@@ -1,0 +1,193 @@
+<div class="box box-primary">
+  <div class="box-header">
+    <h3 class="box-title">{{ domain.label }}</h3>
+  </div>
+  <div class="box-body"></div>
+  <accordion class="sidebar-menu statistics-accordion" close-others>
+    <accordion-group x-is-open="Chart.isopen" data-ng-init="Chart.isopen = true">
+      <accordion-heading>
+        <span>
+          {{ 'STATISTICS.DOMAIN_LABEL' | translate}} {{ domain.label }}
+        </span>
+        <i class="fa pull-right" data-ng-class="{'fa-angle-down': Chart.isopen, 'fa-angle-left': !Chart.isopen}">
+        </i>
+      </accordion-heading>
+      <accordion class="sidebar-menu statistics-details-accordion" close-others>
+        <accordion-group x-is-open="sumChart.isopen" data-ng-init="sumChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ domainlabel | translate}}
+            </span>
+            <i class="fa pull-right" data-ng-class="{'fa-angle-down': sumChart.isopen, 'fa-angle-left': !sumChart.isopen}">
+            </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3 
+              ng-click="fileSizeDetail()" 
+              options='fileSizeChartOptions' 
+              data='sumData'
+            >
+          </nvd3>
+          </div>
+        </accordion-group>
+        <accordion-group x-is-open="sumsChart.isopen" data-ng-init="sumsChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ domainUsedSpaceLabel | translate}}
+            </span>
+            <i class="fa pull-right" data-ng-class="{'fa-angle-down': sumsChart.isopen, 'fa-angle-left': !sumsChart.isopen}">
+            </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3 
+              ng-click="usedSpaceDetail()" 
+              options='fileSizeChartOptions' 
+              data='usedSpaceData'
+            >
+            </nvd3>
+          </div>
+        </accordion-group>
+        <accordion-group x-is-open="countChart.isopen" data-ng-init="countChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ domainOperationCountLabel | translate}}
+              <i class="fa pull-right" data-ng-class="{'fa-angle-down': countChart.isopen, 'fa-angle-left': !countChart.isopen}">
+              </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3 
+              ng-click="operationCountDetail()" 
+              options='operationsChartOptions'
+              data='countData'
+              >
+            </nvd3>
+          </div>
+        </accordion-group>
+      </accordion>
+    </accordion-group>
+    <accordion-group x-is-open="uChart.isopen" data-ng-init="uChart.isopen = true">
+      <accordion-heading>
+        <span>
+          {{ 'STATISTICS.USERS_LABEL' | translate}} {{ domain.label }}
+        </span>
+
+        <i class="fa pull-right" data-ng-class="{'fa-angle-down': uChart.isopen, 'fa-angle-left': !uChart.isopen}">
+        </i>
+      </accordion-heading>
+      <accordion class="sidebar-menu statistics-details-accordion" close-others>
+        <accordion-group x-is-open="sumChart.isopen" data-ng-init="sumChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ userlabel | translate}}
+            </span>
+            <i class="fa pull-right" data-ng-class="{'fa-angle-down': sumChart.isopen, 'fa-angle-left': !sumChart.isopen}">
+            </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3 
+              ng-click="userFileSizeDetail()"
+              options='fileSizeChartOptions' 
+              data='userSumData'
+            >
+            </nvd3>
+          </div>
+        </accordion-group>
+        <accordion-group x-is-open="sumsChart.isopen" data-ng-init="sumsChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ userUsedSpaceLabel | translate}}
+            </span>
+            <i class="fa pull-right" data-ng-class="{'fa-angle-down': sumsChart.isopen, 'fa-angle-left': !sumsChart.isopen}">
+            </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3 
+              ng-click="userUsedSpaceDetail()" 
+              options='fileSizeChartOptions' 
+              data='userUsedSpaceData'
+            >
+            </nvd3>
+          </div>
+        </accordion-group>
+        <accordion-group x-is-open="countChart.isopen" data-ng-init="countChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ userOperationCountLabel | translate}}
+              <i class="fa pull-right" data-ng-class="{'fa-angle-down': countChart.isopen, 'fa-angle-left': !countChart.isopen}">
+              </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3 
+              ng-click="userOperationCountDetail()" 
+              options='operationsChartOptions'
+               data='userCountData'
+             >
+              </nvd3>
+          </div>
+        </accordion-group>
+      </accordion>
+    </accordion-group>
+    <accordion-group x-is-open="wgChart.isopen" data-ng-init="wgChart.isopen = true">
+      <accordion-heading>
+        <span>
+          {{ 'STATISTICS.WORKGROUPS_LABEL' | translate}} {{ domain.label }}
+        </span>
+        <i class="fa pull-right" data-ng-class="{'fa-angle-down': wgChart.isopen, 'fa-angle-left': !wgChart.isopen}">
+        </i>
+      </accordion-heading>
+      <accordion class="sidebar-menu statistics-details-accordion" close-others>
+        <accordion-group x-is-open="sumChart.isopen" data-ng-init="sumChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ grouplabel | translate}}
+            </span>
+            <i class="fa pull-right" data-ng-class="{'fa-angle-down': sumChart.isopen, 'fa-angle-left': !sumChart.isopen}">
+            </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3 
+                ng-click="groupFileSizeDetail()" 
+                options='fileSizeChartOptions' 
+                data='groupSumData'
+                >
+              </nvd3>
+          </div>
+        </accordion-group>
+        <accordion-group x-is-open="sumsChart.isopen" data-ng-init="sumsChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ groupUsedSpaceLabel | translate}}
+            </span>
+            <i class="fa pull-right" data-ng-class="{'fa-angle-down': sumsChart.isopen, 'fa-angle-left': !sumsChart.isopen}">
+            </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3
+               ng-click="groupUsedSpaceDetail()"
+               options='fileSizeChartOptions' 
+               data='groupUsedSpaceData'
+               >
+              </nvd3>
+          </div>
+        </accordion-group>
+        <accordion-group x-is-open="countChart.isopen" data-ng-init="countChart.isopen = true">
+          <accordion-heading>
+            <span>
+              {{ groupOperationCountLabel | translate}}
+              <i class="fa pull-right" data-ng-class="{'fa-angle-down': countChart.isopen, 'fa-angle-left': !countChart.isopen}">
+              </i>
+          </accordion-heading>
+          <div class="chart-cursor">
+            <nvd3
+               ng-click="groupOperationCountDetail()" 
+               options='cstatcountgraph' 
+               data='groupCountData'
+               >
+              </nvd3>
+          </div>
+        </accordion-group>
+      </accordion>
+    </accordion-group>
+  </accordion>
+</div>
+</div>

@@ -1,0 +1,211 @@
+<section class="col-lg-8" >
+<div class="box box-primary">
+  <div class="box-header">
+    <h3 class="box-title">
+      {{ 'THREADS.BOX_FORM.TITLE' | translate }}
+    </h3>
+    <div class="pull-right box-tools">
+      <a class="list btn-back"
+          x-ui-sref="thread.list({search: search})"
+          tooltip="{{'COMMON.BASIC_FORM.BUTTON_CLOSE' | translate}}">
+        <i class="fa fa-2x fa-list pink"></i>
+      </a>
+    </div>
+  </div>
+  <form class="form" name="threadForm" novalidate
+      x-ls-form-submit="submit()"
+      x-ls-form-attempt>
+    <fieldset>
+      <div class="box-body">
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name">
+            {{ 'THREADS.BOX_FORM.LABEL_NAME' | translate }}
+          </label>
+          <input id="name" name="name" type="text" class="form-control" required
+              x-ng-model="thread.name">
+        </div>
+        <div class="section-fieldset">
+          <h4 class="ng-binding">
+            {{ 'THREADS.BOX_MEMBERS_LIST.TITLE' | translate }}
+          </h4>
+          <div class="clearfix"></div>
+          <p class="ng-binding">
+            {{ 'THREADS.BOX_MEMBERS_LIST.DESCRIPTION' | translate }}
+          </p>
+
+          <div class="row form-inline">
+            <div class="form-group col-md-8 col-lg-9">
+              <div class="input-append">
+                <input type="text" class="form-control"
+                       placeholder="{{ 'THREADS.BOX_MEMBERS_LIST.PLACEHOLDER_ADD_MEMBER' | translate }}"
+                       x-ng-model="userToAdd"
+                       x-typeahead-min-length="3"
+                       x-typeahead-wait-ms="30"
+                       x-typeahead-loading="searching"
+                       x-typeahead-on-select="addMember(userToAdd)"
+                       x-typeahead="u for u in autocompleteUsers($viewValue) | filter:$viewValue"
+                       x-typeahead-template-url="user_representation"/>
+              <span class="add-on">
+                <i class="icon icon-plus"></i>
+              </span>
+              </div>
+            </div>
+            <label class="checkbox-inline">{{"THREADS.BOX_MEMBERS_LIST.TABLE.HEADER_ADMIN" | translate}}
+              <input type="checkbox" ng-model="userDefaultAdmin" value="userDefaultAdmin">
+            </label>
+            <label class="checkbox-inline">{{"THREADS.BOX_MEMBERS_LIST.TABLE.HEADER_READ_ONLY" | translate}}
+              <input type="checkbox" ng-model="userDefaultReadOnly" value="userDefaultReadOnly">
+            </label>
+          </div><br />
+          <div class="form-group">
+            <div class="table-responsive">
+              <table class="table"
+                  x-ng-table="tableParams" show-filter="true">
+                <tr x-ng-repeat="threadMember in $data" class="not-linked"
+                    x-ng-click="edit(threadMember)">
+                  <td data-title="'THREADS.BOX_MEMBERS_LIST.TABLE.HEADER_FIRST_NAME' | translate"
+                      filter="{ 'firstName': 'text'}"
+                      sortable="'firstName'">
+                    <span>
+                      {{threadMember.firstName}}
+                    </span>
+                  </td>
+                  <td data-title="'THREADS.BOX_MEMBERS_LIST.TABLE.HEADER_LAST_NAME' | translate"
+                      filter="{ 'lastName': 'text'}"
+                      sortable="'lastName'">
+                    <span>
+                      {{threadMember.lastName}}
+                    </span>
+                  </td>
+                  <td class="col-sm-1"
+                      data-title="'THREADS.BOX_MEMBERS_LIST.TABLE.HEADER_READ_ONLY' | translate"
+                      sortable="'readonly'">
+                    <input type="checkbox"
+                        x-ng-model="threadMember.readonly"
+                        x-ng-disabled="threadMember.admin"
+                        x-ng-checked="!threadMember.admin && threadMember.readonly"
+                        x-ng-change="updateMember(threadMember)" />
+                  </td>
+                  <td class="col-sm-1"
+                      data-title="'THREADS.BOX_MEMBERS_LIST.TABLE.HEADER_ADMIN' | translate"
+                      sortable="'admin'">
+                    <input type="checkbox"
+                        x-ng-model="threadMember.admin"
+                        x-ng-change="updateMember(threadMember)" />
+                  </td>
+                  <td class="col-sm-2"
+                      data-title="'THREADS.BOX_MEMBERS_LIST.TABLE.HEADER_ACTIONS' | translate">
+                    <button class="btn btn-danger" type="button"
+                        x-ng-show="confirm === undefined"
+                        x-ng-click="confirm = $index">
+                      {{'THREADS.BOX_MEMBERS_LIST.TABLE.BUTTON_DELETE_MEMBER' | translate}}
+                    </button>
+                    <button class="btn" type="button"
+                        x-ng-show="confirm === $index"
+                        x-ng-click="confirm = undefined">
+                      {{'THREADS.BOX_MEMBERS_LIST.TABLE.BUTTON_DELETE_MEMBER_NO' | translate}}
+                    </button>
+                    <button class="btn btn-danger" type="button"
+                        x-ng-show="confirm === $index"
+                        x-ng-click="deleteMember(threadMember)">
+                      {{'THREADS.BOX_MEMBERS_LIST.TABLE.BUTTON_DELETE_MEMBER_YES' | translate}}
+                    </button>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="box-footer">
+            <!-- Validation -->
+            <div class="control-group">
+              <div class="controls">
+                <button id="delete" name="delete" type="button" class="btn btn-danger"
+                    x-ng-click="remove()">
+                  {{ 'THREADS.BOX_FORM.FORM_ACTIONS.BUTTON_DELETE' | translate }}
+                </button>
+                <button type="button" id="reset" name="reset" class="btn btn-warning"
+                    x-ng-click="reset()">
+                  {{ 'THREADS.BOX_FORM.FORM_ACTIONS.BUTTON_RESET' | translate }}
+                </button>
+                <button type="submit" id="submit" name="submit" class="btn btn-success">
+                  {{ 'THREADS.BOX_FORM.FORM_ACTIONS.BUTTON_SUBMIT' | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+</div>
+</section>
+<!-- USER LIST -->
+<script type="text/ng-template" id="user_representation">
+     <a>
+         <span bind-html-unsafe="match.model.firstName | typeaheadHighlight:query"></span>&nbsp;
+         <span bind-html-unsafe="match.model.lastName | typeaheadHighlight:query"></span>&nbsp;&lt;
+         <span bind-html-unsafe="match.model.mail | typeaheadHighlight:query"></span>&gt;
+     </a>
+</script>
+<section class="col-lg-4" >
+  <div class="box box-primary">
+    <div class="box-header"
+         >
+      <h3 class="box-title">
+        {{'STATISTICS.LABEL_WORKGROUP_STATISTICS' | translate}}
+      </h3>
+    </div>
+         <div class="box-body"><accordion class="sidebar-menu statistics-details-accordion" close-others>
+            <accordion-group x-is-open="sumChart.isopen" data-ng-init="sumChart.isopen = true">
+              <accordion-heading>
+                  <span> {{workgrouplabel | translate}}</span>
+                       <i class="fa pull-right"
+                            data-ng-class="{'fa-angle-down': sumChart.isopen, 'fa-angle-left': !sumChart.isopen}">
+                                       </i>
+                              </accordion-heading>
+                         <div  class="chart-cursor">
+                             <nvd3 
+                               ng-click="workgroupFileSizeDetail()"  
+                               options='fileSizeChartOptions' 
+                               data='workgroupSumDatas'
+                               >
+                              </nvd3>
+                                </div>
+                       </accordion-group>
+           <accordion-group x-is-open="sumsChart.isopen" data-ng-init="sumsChart.isopen = false">
+                <accordion-heading>
+                 <span>{{workgroupUsedSpaceLabel | translate}} </span>
+                           <i class="fa pull-right"
+                                    data-ng-class="{'fa-angle-down': sumsChart.isopen, 'fa-angle-left': !sumsChart.isopen}">
+                                  </i>
+                                </accordion-heading>
+               <div class="chart-cursor">
+              <nvd3
+                  ng-click="workgroupUsedSpaceDetail()" 
+                  options='fileSizeChartOptions'
+                  data='workgroupUsedSpaceDatas'
+                  >
+                </nvd3>
+               </div>
+            </accordion-group>
+                    <accordion-group x-is-open="countChart.isopen" data-ng-init="countChart.isopen = false">
+                 <accordion-heading>
+                   <span>  {{workgroupOperationCountLabel | translate}}</span>
+                                  <i class="fa pull-right"
+                                   data-ng-class="{'fa-angle-down': countChart.isopen, 'fa-angle-left': !countChart.isopen}">
+                                          </i>
+                     </accordion-heading>
+                     <div class="chart-cursor">
+                             <nvd3
+                                 ng-click="workgroupOperationCountDetail()"
+                                 options='operationsChartOptions'
+                                 data='workgroupCountDatas'
+                                >
+                              </nvd3>
+                            </div>
+                    </accordion-group>
+                 </accordion>
+             </div>
+         </div>
+  </section>
