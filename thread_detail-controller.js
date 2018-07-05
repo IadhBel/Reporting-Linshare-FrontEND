@@ -1,0 +1,135 @@
+'use strict';
+
+angular.module('linshareAdminApp')
+  .controller('ThreadDetailCtrl',
+    ['$rootScope', '$scope', '$filter', '$log', '$state', 'ngTableParams', 'Thread', 'ThreadMember', 'User',
+      'currentThread', 'fileSizeChartOptions', 'operationsChartOptions','WorkGroupDatas',
+      function ($rootScope, $scope, $filter, $log, $state, ngTableParams, Thread, ThreadMember, User, currentThread, fileSizeChartOptions, operationsChartOptions, WorkGroupDatas) {
+        $scope.thread = currentThread;
+        $scope.search = $state.params.search;
+        $scope.reloadList = function () {
+          $scope.tableParams.reload();
+        };
+        $scope.remove = function () {
+          Thread.remove($scope.thread).then(function () {
+            $state.go('thread.list');
+          });
+        };
+        $scope.reset = function () {
+          $state.reinit();
+        };
+        $scope.submit = function () {
+          Thread.update($scope.thread);
+        };
+        $scope.addMember = function (member) {
+          member.admin = $scope.userDefaultAdmin;
+          member.readonly = $scope.userDefaultReadOnly;
+          ThreadMember.add($scope.thread, member).then(function () {
+            $scope.reloadList();
+            $scope.userToAdd = undefined;
+          });
+        };
+        $scope.autocompleteUsers = function (pattern) {
+          return User.autocomplete(pattern).then(function (users) {
+            // Remove existing members
+            angular.forEach($scope.threadMembers, function (threadMember) {
+              angular.forEach(users, function (user, key) {
+                if (user.domain === threadMember.userDomainId &&
+                  user.mail === threadMember.userMail) {
+                  users.splice(key, 1);
+                }
+              });
+            });
+            return users;
+          });
+        };
+        $scope.updateMember = function (member) {
+          ThreadMember.update(member);
+        };
+        $scope.deleteMember = function (member) {
+          ThreadMember.remove(member).then(function () {
+            $scope.reloadList();
+          });
+        };
+
+        $scope.$watch('userToAdd', function () {
+          if ($scope.tableParams.filter()['firstName']) {
+            $scope.tableParams.filter()['firstName'] = '';
+          }
+          if ($scope.tableParams.filter()['lastName']) {
+            $scope.tableParams.filter()['lastName'] = '';
+          }
+          $scope.reloadList();
+        });
+
+        $scope.tableParams = new ngTableParams({ /* jshint ignore: line */
+          page: 1,        // show first page
+          count: 10,      // count per page
+          sorting: {
+            firstName: 'asc'
+          }
+        }, {
+            debugMode: false,
+            total: 0, // length of data
+            getData: function ($defer, params) {
+              ThreadMember.getAll($scope.thread).then(function (threadMembers) {
+                $scope.threadMembers = threadMembers;
+                var filteredData = $filter('filter')(threadMembers, $scope.userToAdd);
+                filteredData = $filter('filter')(filteredData, params.filter());
+                var orderedData = params.sorting() ?
+                  $filter('orderBy')(filteredData, params.orderBy()) : filteredData;
+                params.total(orderedData.length);
+                $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+              });
+            }
+          });
+        $scope.fileSizeChartOptions = fileSizeChartOptions;
+        $scope.operationsChartOptions = operationsChartOptions;
+        $scope.workgroupSumDatas = WorkGroupDatas.statWorkgroupMonthlyGraphDataSum;
+        $scope.workgroupUsedSpaceDatas = WorkGroupDatas.statWorkgroupMonthlyUsedSpaceGraphData;
+        $scope.workgroupCountDatas = WorkGroupDatas.statWorkgroupMonthlyGraphDataCount;
+        $scope.workgrouplabel = 'STATISTICS.SUM_STATISTICS.SIZE.MONTHLY';
+        $scope.workgroupUsedSpaceLabel = 'STATISTICS.SUM_STATISTICS.USED_SPACE.MONTHLY';
+        $scope.workgroupOperationCountLabel = 'STATISTICS.COUNT_STATISTICS.OPERATION_COUNT.MONTHLY';
+        $scope.workgroupFileSizeDetail = function () {
+          switch ($scope.workgrouplabel) {
+            case 'STATISTICS.SUM_STATISTICS.SIZE.DAILY':
+              $scope.workgroupSumDatas = WorkGroupDatas.statWorkgroupMonthlyGraphDataSum; $scope.workgrouplabel = 'STATISTICS.SUM_STATISTICS.SIZE.MONTHLY';
+              break;
+            case 'STATISTICS.SUM_STATISTICS.SIZE.WEEKLY':
+              $scope.workgroupSumDatas = WorkGroupDatas.statWorkgroupWeeklyGraphDataSum; $scope.workgrouplabel = 'STATISTICS.SUM_STATISTICS.SIZE.DAILY';
+              break;
+            case 'STATISTICS.SUM_STATISTICS.SIZE.MONTHLY':
+              $scope.workgroupSumDatas = WorkGroupDatas.statWorkgroupDailyGraphDataSum; $scope.workgrouplabel = 'STATISTICS.SUM_STATISTICS.SIZE.WEEKLY';
+              break;
+          };
+        };
+        $scope.workgroupUsedSpaceDetail = function () {
+          switch ($scope.workgroupUsedSpaceLabel) {
+            case 'STATISTICS.SUM_STATISTICS.USED_SPACE.DAILY':
+              $scope.workgroupUsedSpaceDatas = WorkGroupDatas.statWorkgroupMonthlyUsedSpaceGraphData; $scope.workgroupUsedSpaceLabel = 'STATISTICS.SUM_STATISTICS.USED_SPACE.MONTHLY';
+              break;
+            case 'STATISTICS.SUM_STATISTICS.USED_SPACE.WEEKLY':
+              $scope.workgroupUsedSpaceDatas = WorkGroupDatas.statWorkgroupWeeklyUsedSpaceGraphData; $scope.workgroupUsedSpaceLabel = 'STATISTICS.SUM_STATISTICS.USED_SPACE.DAILY';
+              break;
+            case 'STATISTICS.SUM_STATISTICS.USED_SPACE.MONTHLY':
+              $scope.workgroupUsedSpaceDatas = WorkGroupDatas.statWorkgroupDailyUsedSpaceGraphData; $scope.workgroupUsedSpaceLabel = 'STATISTICS.SUM_STATISTICS.USED_SPACE.WEEKLY';
+              break;
+          };
+        };
+        $scope.workgroupOperationCountDetail = function () {
+          switch ($scope.workgroupOperationCountLabel) {
+            case 'STATISTICS.COUNT_STATISTICS.OPERATION_COUNT.DAILY':
+              $scope.workgroupCountDatas = WorkGroupDatas.statWorkgroupMonthlyGraphDataCount; $scope.workgroupOperationCountLabel = 'STATISTICS.COUNT_STATISTICS.OPERATION_COUNT.MONTHLY';
+              break;
+            case 'STATISTICS.COUNT_STATISTICS.OPERATION_COUNT.WEEKLY':
+              $scope.workgroupCountDatas = WorkGroupDatas.statWorkgroupWeeklyGraphDataCount; $scope.workgroupOperationCountLabel = 'STATISTICS.COUNT_STATISTICS.OPERATION_COUNT.DAILY';
+              break;
+            case 'STATISTICS.COUNT_STATISTICS.OPERATION_COUNT.MONTHLY':
+              $scope.workgroupCountDatas = WorkGroupDatas.statWorkgroupDailyGraphDataCount; $scope.workgroupOperationCountLabel = 'STATISTICS.COUNT_STATISTICS.OPERATION_COUNT.WEEKLY';
+              break;
+          };
+        };
+      }]
+  );
+
